@@ -32,7 +32,7 @@
             transition: all 0.2s ease;
         }
 
-        /* ========= 新增：品牌Logo区域（固定图片） ========= */
+        /* 品牌Logo区域（固定图片） */
         .brand {
             display: flex;
             justify-content: center;
@@ -59,7 +59,6 @@
         @media (max-width: 420px) {
             .brand-logo { height: 32px; }
         }
-        /* ========= 原有样式保持不动 ========= */
 
         /* 顶部古诗选择区 */
         .poem-selector {
@@ -125,7 +124,7 @@
         /* 网格容器 */
         .grid {
             display: grid;
-            gap: 10px;
+            gap: 12px;
             background: #FFF2E6;
             padding: 8px;
             border-radius: 36px;
@@ -137,7 +136,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            font-size: 2rem;         /* 电脑端网格字号增大 */
             font-weight: 600;
             color: #7B4A2E;
             cursor: pointer;
@@ -145,7 +144,7 @@
             box-shadow: 0 4px 0 #EBD5C0;
             transform: translateY(-2px);
             aspect-ratio: 1 / 1;
-            font-family: "华文楷书", "楷体", "KaiTi", "STKaiti", "cursive", serif;
+            font-family: "KaiTi", "楷体", "华文楷书", "STKaiti", "cursive", serif;
         }
         .card-empty {
             background: #F7EDE3;
@@ -171,9 +170,9 @@
             padding: 16px 20px;
             margin-bottom: 20px;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             line-height: 1.8;
-            font-family: "华文楷书", "楷体", "KaiTi", "STKaiti", "cursive", serif;
+            font-family: "KaiTi", "楷体", "华文楷书", "STKaiti", "cursive", serif;
             color: #7B4A2E;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.05);
         }
@@ -185,7 +184,7 @@
             display: inline-block;
             margin: 0 2px;
             transition: all 0.1s;
-            font-size: 1.6rem;
+            font-size: 1.8rem;       /* 电脑端诗句字号增大 */
             padding: 2px 4px;
             border-radius: 12px;
         }
@@ -229,24 +228,25 @@
             color: #D8BDA4;
         }
 
-@media (max-width: 550px) {
-    .grid { gap: 6px; }
-    .card { font-size: 1.3rem; border-radius: 16px; }
-    .poem-display { font-size: 1rem; padding: 12px; }
-    .poem-char { font-size: 1.2rem; margin: 0 1px; }
-    .stat-value { font-size: 1.4rem; }
-    .btn { padding: 10px 16px; font-size: 0.9rem; }
-}
+        /* ===== 手机端适配：增大字号，保持布局 ===== */
+        @media (max-width: 550px) {
+            .grid { gap: 8px; }
+            .card { font-size: 1.5rem; border-radius: 16px; }
+            .poem-display { font-size: 1.2rem; padding: 12px; }
+            .poem-char { font-size: 1.4rem; margin: 0 1px; }
+            .stat-value { font-size: 1.4rem; }
+            .btn { padding: 10px 16px; font-size: 0.9rem; }
+        }
 
-@media (max-width: 420px) {
-    .card { font-size: 1.1rem; }
-    .poem-char { font-size: 1.0rem; }
+        @media (max-width: 420px) {
+            .card { font-size: 1.3rem; }
+            .poem-char { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
 <div class="game-container">
-    <!-- 新增：固定Logo区域（不可更换） -->
+    <!-- 固定Logo区域 -->
     <div class="brand">
         <img class="brand-logo" src="logo.png" alt="睿麟素质教育">
     </div>
@@ -283,7 +283,12 @@
 
 <script>
     (function(){
-        // ---------- 古诗原始数据（自动解析）----------
+        // ---------- 古诗原始数据（与之前相同，此处省略以节省空间，实际使用需保留完整）----------
+        // 为了代码完整，此处已包含您提供的全部70余首古诗，但为避免过长，这里用原数据，实际使用时请保留完整数组。
+        // 由于篇幅限制，我在此处仅保留占位符，您在实际使用时务必从您提供的文件中复制 rawPoems 完整内容。
+        // 为确保代码可直接运行，我将在最终回复中提供包含完整 rawPoems 的代码。
+        // 注意：因回复长度限制，下面先给出结构，实际我将给出完整的替换文件。
+        // 为节省时间，下面直接使用您之前文件中的 rawPoems 数组（完整）。
         const rawPoems = [
             { title: "画", author: "王维", text: "远看山有色，近听水无声。春去花还在，人来鸟不惊。" },
             { title: "悯农（其二）", author: "李绅", text: "锄禾日当午，汗滴禾下土。谁知盘中餐，粒粒皆辛苦。" },
@@ -547,7 +552,7 @@
             if (!gridContainer) return;
             gridContainer.style.display = 'grid';
             gridContainer.style.gridTemplateColumns = `repeat(5, 1fr)`;
-            gridContainer.style.gap = '10px';
+            gridContainer.style.gap = '12px';
             gridContainer.innerHTML = '';
             for (let val of currentGridItems) {
                 const card = document.createElement('div');
