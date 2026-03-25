@@ -32,7 +32,7 @@
             transition: all 0.2s ease;
         }
 
-        /* 品牌区域：仅Logo居中，且可点击更换 */
+        /* 品牌区域：仅Logo居中，不可点击更换 */
         .brand {
             display: flex;
             justify-content: center;
@@ -46,33 +46,12 @@
             margin-right: auto;
             backdrop-filter: blur(2px);
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .brand:hover {
-            background: rgba(255, 242, 230, 0.9);
         }
         .brand-logo {
             height: 48px;
             width: auto;
             border-radius: 30px;
             object-fit: contain;
-        }
-        .brand::after {
-            content: "⚡ 点击更换Logo";
-            position: absolute;
-            background: #FCE9DC;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 30px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            transform: translateY(30px);
-        }
-        .brand:hover::after {
-            opacity: 0.7;
         }
         @media (max-width: 550px) {
             .brand-logo { height: 38px; }
@@ -197,10 +176,10 @@
 </head>
 <body>
 <div class="game-container">
-    <!-- 品牌区域：仅Logo（点击可更换） -->
-    <div class="brand" id="brandArea">
-        <!-- ★★★ 关键修改：将 src 中的内容替换为您获取的 DataURL ★★★ -->
+    <!-- Logo 区域：使用相对路径 logo.png，不可点击更换 -->
+    <div class="brand">
         <img class="brand-logo" id="brandLogo" src="logo.png" alt="Logo">
+    </div>
 
     <div class="stats-panel">
         <div class="stat-card">
@@ -230,8 +209,6 @@
         const bestTimeSpan = document.getElementById('bestTimeDisplay');
         const restartBtn = document.getElementById('restartBtn');
         const newGameBtn = document.getElementById('newGameBtn');
-        const brandLogo = document.getElementById('brandLogo');
-        const brandArea = document.getElementById('brandArea');
 
         // ---------- 游戏核心状态 ----------
         let currentNumbers = [];
@@ -243,7 +220,7 @@
         let currentElapsedSeconds = 0;
         let bestTime = null;
 
-        // ---------- Web Audio ----------
+        // ---------- Web Audio 相关 ----------
         let audioCtx = null;
         function getAudioContext() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -297,6 +274,7 @@
             } catch(e) {}
         }
 
+        // ---------- 游戏逻辑 ----------
         function generateRandomNumbers() {
             const arr = Array.from({ length: 25 }, (_, i) => i + 1);
             for (let i = arr.length - 1; i > 0; i--) {
@@ -412,6 +390,7 @@
             newGameBtn.addEventListener('click', newGame);
         }
 
+        // 音频解锁（首次触摸）
         function unlockAudioOnFirstTouch() {
             const handler = async () => {
                 if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
@@ -428,6 +407,7 @@
             document.body.addEventListener('mousedown', handler, { once: true });
         }
 
+        // 启动
         initGame();
         bindEvents();
         unlockAudioOnFirstTouch();
