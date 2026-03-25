@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>古诗舒尔特方格 · 睿麟素质教育</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #FFF2E6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(255, 245, 235, 0.9);
+            border-radius: 48px;
+            padding: 20px 16px 28px;
+            box-shadow: 0 20px 35px rgba(160, 100, 60, 0.12), 0 4px 12px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 750px;
+            transition: all 0.2s ease;
+        }
+
+        /* ========= 新增：品牌Logo区域（固定图片） ========= */
+        .brand {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            background: rgba(255, 249, 242, 0.7);
+            border-radius: 60px;
+            padding: 8px 20px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+        .brand-logo {
+            height: 48px;
+            width: auto;
+            border-radius: 30px;
+            object-fit: contain;
+        }
+        @media (max-width: 550px) {
+            .brand-logo { height: 38px; }
+        }
+        @media (max-width: 420px) {
+            .brand-logo { height: 32px; }
+        }
+        /* ========= 原有样式保持不动 ========= */
+
+        /* 顶部古诗选择区 */
+        .poem-selector {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .poem-selector label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #B97F5C;
+            margin-right: 12px;
+        }
+        #poemSelect {
+            background: #FFF9F2;
+            border: 1px solid #EAD3C0;
+            border-radius: 40px;
+            padding: 8px 20px;
+            font-size: 1rem;
+            font-family: inherit;
+            color: #7B4A2E;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: 0.2s;
+        }
+        #poemSelect:focus {
+            border-color: #A66B48;
+        }
+
+        /* 统计面板 */
+        .stats-panel {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            background: #FFF9F2;
+            padding: 10px 20px;
+            border-radius: 60px;
+        }
+        .stat-card {
+            background: #FCE9DC;
+            border-radius: 48px;
+            padding: 6px 16px;
+            text-align: center;
+            flex: 1;
+            min-width: 100px;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #B97F5C;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #A66B48;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+
+        /* 网格容器 */
+        .grid {
+            display: grid;
+            gap: 10px;
+            background: #FFF2E6;
+            padding: 8px;
+            border-radius: 36px;
+            margin-bottom: 24px;
+        }
+        .card {
+            background: #FFFFFF;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #7B4A2E;
+            cursor: pointer;
+            transition: all 0.1s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 4px 0 #EBD5C0;
+            transform: translateY(-2px);
+            aspect-ratio: 1 / 1;
+            font-family: "KaiTi", "楷体", "STKaiti", serif;
+        }
+        .card-empty {
+            background: #F7EDE3;
+            color: transparent;
+            cursor: default;
+            box-shadow: none;
+            transform: none;
+            text-shadow: none;
+        }
+        .card-empty:active {
+            transform: none;
+        }
+        .card-correct {
+            background: #C8E6B5 !important;
+            transform: scale(0.92) !important;
+            box-shadow: 0 2px 0 #AAC88A !important;
+        }
+
+        /* 诗句展示区 */
+        .poem-display {
+            background: #FFF9F2;
+            border-radius: 32px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            font-family: "KaiTi", "楷体", "STKaiti", serif;
+            color: #7B4A2E;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .poem-line {
+            margin: 6px 0;
+            white-space: pre-wrap;
+        }
+        .poem-char {
+            display: inline-block;
+            margin: 0 2px;
+            transition: all 0.1s;
+            font-size: 1.2rem;
+            padding: 2px 4px;
+            border-radius: 12px;
+        }
+        .poem-char.highlight {
+            background-color: #FADB67;
+            color: #7B4A2E;
+            font-weight: bold;
+            transform: scale(1.02);
+        }
+
+        /* 按钮 */
+        .button-bar {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            border: none;
+            background: #F5E1D0;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 48px;
+            color: #976B48;
+            cursor: pointer;
+            flex: 1;
+            min-width: 120px;
+            box-shadow: 0 3px 5px rgba(100, 60, 20, 0.1);
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: scale(0.96);
+            background: #EAD3C0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.7rem;
+            color: #D8BDA4;
+        }
+
+        @media (max-width: 550px) {
+            .grid { gap: 6px; }
+            .card { font-size: 1rem; border-radius: 16px; }
+            .poem-display { font-size: 1rem; padding: 12px; }
+            .poem-char { font-size: 1rem; margin: 0 1px; }
+            .stat-value { font-size: 1.4rem; }
+            .btn { padding: 10px 16px; font-size: 0.9rem; }
+        }
+        @media (max-width: 420px) {
+            .card { font-size: 0.9rem; }
+            .poem-char { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <!-- 新增：固定Logo区域（不可更换） -->
+    <div class="brand">
+        <img class="brand-logo" src="logo.png" alt="睿麟素质教育">
+    </div>
+
+    <!-- 古诗选择 -->
+    <div class="poem-selector">
+        <label>📖 选择古诗：</label>
+        <select id="poemSelect"></select>
+    </div>
+
+    <div class="stats-panel">
+        <div class="stat-card">
+            <div class="stat-label">⏱️ 当前用时</div>
+            <div class="stat-value" id="currentTimeDisplay">0.00</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">🏆 最佳成绩</div>
+            <div class="stat-value" id="bestTimeDisplay">—</div>
+        </div>
+    </div>
+
+    <!-- 网格容器 -->
+    <div class="grid" id="gridContainer"></div>
+
+    <!-- 诗句全文显示区 -->
+    <div class="poem-display" id="poemDisplay"></div>
+
+    <div class="button-bar">
+        <button class="btn" id="restartBtn">🔄 重新开始</button>
+        <button class="btn" id="newGameBtn">✨ 新游戏</button>
+    </div>
+    <footer>按诗句顺序点击汉字 | 错误无响应 | 睿麟素质教育 · 专注力训练</footer>
+</div>
+
+<script>
+    (function(){
+        // ---------- 古诗原始数据（自动解析）----------
+        const rawPoems = [
+            { title: "画", author: "王维", text: "远看山有色，近听水无声。春去花还在，人来鸟不惊。" },
+            { title: "悯农（其二）", author: "李绅", text: "锄禾日当午，汗滴禾下土。谁知盘中餐，粒粒皆辛苦。" },
+            { title: "古朗月行（节选）", author: "李白", text: "小时不识月，呼作白玉盘。又疑瑶台镜，飞在青云端。" },
+            { title: "风", author: "李峤", text: "解落三秋叶，能开二月花。过江千尺浪，入竹万竿斜。" },
+            { title: "春晓", author: "孟浩然", text: "春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少。" },
+            { title: "赠汪伦", author: "李白", text: "李白乘舟将欲行，忽闻岸上踏歌声。桃花潭水深千尺，不及汪伦送我情。" },
+            { title: "静夜思", author: "李白", text: "床前明月光，疑是地上霜。举头望明月，低头思故乡。" },
+            { title: "寻隐者不遇", author: "贾岛", text: "松下问童子，言师采药去。只在此山中，云深不知处。" },
+            { title: "池上", author: "白居易", text: "小娃撑小艇，偷采白莲回。不解藏踪迹，浮萍一道开。" },
+            { title: "小池", author: "杨万里", text: "泉眼无声惜细流，树阴照水爱晴柔。小荷才露尖尖角，早有蜻蜓立上头。" },
+            { title: "画鸡", author: "唐寅", text: "头上红冠不用裁，满身雪白走将来。平生不敢轻言语，一叫千门万户开。" },
+            { title: "梅花", author: "王安石", text: "墙角数枝梅，凌寒独自开。遥知不是雪，为有暗香来。" },
+            { title: "小儿垂钓", author: "胡令能", text: "蓬头稚子学垂纶，侧坐莓苔草映身。路人借问遥招手，怕得鱼惊不应人。" },
+            { title: "登鹳雀楼", author: "王之涣", text: "白日依山尽，黄河入海流。欲穷千里目，更上一层楼。" },
+            { title: "望庐山瀑布", author: "李白", text: "日照香炉生紫烟，遥看瀑布挂前川。飞流直下三千尺，疑是银河落九天。" },
+            { title: "江雪", author: "柳宗元", text: "千山鸟飞绝，万径人踪灭。孤舟蓑笠翁，独钓寒江雪。" },
+            { title: "夜宿山寺", author: "李白", text: "危楼高百尺，手可摘星辰。不敢高声语，恐惊天上人。" },
+            { title: "村居", author: "高鼎", text: "草长莺飞二月天，拂堤杨柳醉春烟。儿童散学归来早，忙趁东风放纸鸢。" },
+            { title: "咏柳", author: "贺知章", text: "碧玉妆成一树高，万条垂下绿丝绦。不知细叶谁裁出，二月春风似剪刀。" },
+            { title: "晓出净慈寺送林子方", author: "杨万里", text: "毕竟西湖六月中，风光不与四时同。接天莲叶无穷碧，映日荷花别样红。" },
+            { title: "绝句", author: "杜甫", text: "两个黄鹂鸣翠柳，一行白鹭上青天。窗含西岭千秋雪，门泊东吴万里船。" },
+            { title: "悯农（其一）", author: "李绅", text: "春种一粒粟，秋收万颗子。四海无闲田，农夫犹饿死。" },
+            { title: "舟夜书所见", author: "查慎行", text: "月黑见渔灯，孤光一点萤。微微风簇浪，散作满河星。" },
+            { title: "所见", author: "袁枚", text: "牧童骑黄牛，歌声振林樾。意欲捕鸣蝉，忽然闭口立。" },
+            { title: "山行", author: "杜牧", text: "远上寒山石径斜，白云生处有人家。停车坐爱枫林晚，霜叶红于二月花。" },
+            { title: "赠刘景文", author: "苏轼", text: "荷尽已无擎雨盖，菊残犹有傲霜枝。一年好景君须记，正是橙黄橘绿时。" },
+            { title: "夜书所见", author: "叶绍翁", text: "萧萧梧叶送寒声，江上秋风动客情。知有儿童挑促织，夜深篱落一灯明。" },
+            { title: "望天门山", author: "李白", text: "天门中断楚江开，碧水东流至此回。两岸青山相对出，孤帆一片日边来。" },
+            { title: "饮湖上初晴后雨", author: "苏轼", text: "水光潋滟晴方好，山色空蒙雨亦奇。欲把西湖比西子，淡妆浓抹总相宜。" },
+            { title: "望洞庭", author: "刘禹锡", text: "湖光秋月两相和，潭面无风镜未磨。遥望洞庭山水翠，白银盘里一青螺。" },
+            { title: "早发白帝城", author: "李白", text: "朝辞白帝彩云间，千里江陵一日还。两岸猿声啼不住，轻舟已过万重山。" },
+            { title: "采莲曲", author: "王昌龄", text: "荷叶罗裙一色裁，芙蓉向脸两边开。乱入池中看不见，闻歌始觉有人来。" },
+            { title: "绝句·迟日江山丽", author: "杜甫", text: "迟日江山丽，春风花草香。泥融飞燕子，沙暖睡鸳鸯。" },
+            { title: "惠崇春江晚景", author: "苏轼", text: "竹外桃花三两枝，春江水暖鸭先知。蒌蒿满地芦芽短，正是河豚欲上时。" },
+            { title: "三衢道中", author: "曾几", text: "梅子黄时日日晴，小溪泛尽却山行。绿阴不减来时路，添得黄鹂四五声。" },
+            { title: "元日", author: "王安石", text: "爆竹声中一岁除，春风送暖入屠苏。千门万户曈曈日，总把新桃换旧符。" },
+            { title: "清明", author: "杜牧", text: "清明时节雨纷纷，路上行人欲断魂。借问酒家何处有，牧童遥指杏花村。" },
+            { title: "九月九日忆山东兄弟", author: "王维", text: "独在异乡为异客，每逢佳节倍思亲。遥知兄弟登高处，遍插茱萸少一人。" },
+            { title: "鹿柴", author: "王维", text: "空山不见人，但闻人语响。返景入深林，复照青苔上。" },
+            { title: "暮江吟", author: "白居易", text: "一道残阳铺水中，半江瑟瑟半江红。可怜九月初三夜，露似真珠月似弓。" },
+            { title: "题西林壁", author: "苏轼", text: "横看成岭侧成峰，远近高低各不同。不识庐山真面目，只缘身在此山中。" },
+            { title: "雪梅", author: "卢梅坡", text: "梅雪争春未肯降，骚人阁笔费评章。梅须逊雪三分白，雪却输梅一段香。" },
+            { title: "嫦娥", author: "李商隐", text: "云母屏风烛影深，长河渐落晓星沉。嫦娥应悔偷灵药，碧海青天夜夜心。" },
+            { title: "出塞", author: "王昌龄", text: "秦时明月汉时关，万里长征人未还。但使龙城飞将在，不教胡马度阴山。" },
+            { title: "凉州词", author: "王翰", text: "葡萄美酒夜光杯，欲饮琵琶马上催。醉卧沙场君莫笑，古来征战几人回？" },
+            { title: "夏日绝句", author: "李清照", text: "生当作人杰，死亦为鬼雄。至今思项羽，不肯过江东。" },
+            { title: "别董大", author: "高适", text: "千里黄云白日曛，北风吹雁雪纷纷。莫愁前路无知己，天下谁人不识君？" },
+            { title: "乡村四月", author: "翁卷", text: "绿遍山原白满川，子规声里雨如烟。乡村四月闲人少，才了蚕桑又插田。" },
+            { title: "四时田园杂兴", author: "范成大", text: "昼出耘田夜绩麻，村庄儿女各当家。童孙未解供耕织，也傍桑阴学种瓜。" },
+            { title: "乞巧", author: "林杰", text: "七夕今宵看碧霄，牵牛织女渡河桥。家家乞巧望秋月，穿尽红丝几万条。" },
+            { title: "示儿", author: "陆游", text: "死去元知万事空，但悲不见九州同。王师北定中原日，家祭无忘告乃翁。" },
+            { title: "题临安邸", author: "林升", text: "山外青山楼外楼，西湖歌舞几时休？暖风熏得游人醉，直把杭州作汴州。" },
+            { title: "己亥杂诗", author: "龚自珍", text: "九州生气恃风雷，万马齐喑究可哀。我劝天公重抖擞，不拘一格降人才。" },
+            { title: "枫桥夜泊", author: "张继", text: "月落乌啼霜满天，江枫渔火对愁眠。姑苏城外寒山寺，夜半钟声到客船。" },
+            { title: "观书有感（其一）", author: "朱熹", text: "半亩方塘一鉴开，天光云影共徘徊。问渠那得清如许？为有源头活水来。" },
+            { title: "观书有感（其二）", author: "朱熹", text: "昨夜江边春水生，艨艟巨舰一毛轻。向来枉费推移力，此日中流自在行。" },
+            { title: "浪淘沙", author: "刘禹锡", text: "九曲黄河万里沙，浪淘风簸自天涯。如今直上银河去，同到牵牛织女家。" },
+            { title: "凉州词", author: "王之涣", text: "黄河远上白云间，一片孤城万仞山。羌笛何须怨杨柳，春风不度玉门关。" },
+            { title: "牧童", author: "吕岩", text: "草铺横野六七里，笛弄晚风三四声。归来饱饭黄昏后，不脱蓑衣卧月明。" },
+            { title: "舟过安仁", author: "杨万里", text: "一叶渔船两小童，收篙停棹坐船中。怪生无雨都张伞，不是遮头是使风。" },
+            { title: "宿建德江", author: "孟浩然", text: "移舟泊烟渚，日暮客愁新。野旷天低树，江清月近人。" },
+            { title: "六月二十七日望湖楼醉书", author: "苏轼", text: "黑云翻墨未遮山，白雨跳珠乱入船。卷地风来忽吹散，望湖楼下水如天。" },
+            { title: "春日", author: "朱熹", text: "胜日寻芳泗水滨，无边光景一时新。等闲识得东风面，万紫千红总是春。" },
+            { title: "回乡偶书", author: "贺知章", text: "少小离家老大回，乡音无改鬓毛衰。儿童相见不相识，笑问客从何处来。" },
+            { title: "江南春", author: "杜牧", text: "千里莺啼绿映红，水村山郭酒旗风。南朝四百八十寺，多少楼台烟雨中。" },
+            { title: "书湖阴先生壁", author: "王安石", text: "茅檐长扫净无苔，花木成畦手自栽。一水护田将绿绕，两山排闼送青来。" },
+            { title: "鸟鸣涧", author: "王维", text: "人闲桂花落，夜静春山空。月出惊山鸟，时鸣春涧中。" },
+            { title: "芙蓉楼送辛渐", author: "王昌龄", text: "寒雨连江夜入吴，平明送客楚山孤。洛阳亲友如相问，一片冰心在玉壶。" },
+            { title: "江畔独步寻花", author: "杜甫", text: "黄师塔前江水东，春光懒困倚微风。桃花一簇开无主，可爱深红爱浅红。" },
+            { title: "石灰吟", author: "于谦", text: "千锤万凿出深山，烈火焚烧若等闲。粉身碎骨浑不怕，要留清白在人间。" },
+            { title: "竹石", author: "郑燮", text: "咬定青山不放松，立根原在破岩中。千磨万击还坚劲，任尔东西南北风。" }
+        ];
+
+        // 自动提取汉字序列并判断类型
+        function extractCharacters(text) {
+            return text.match(/[\u4e00-\u9fa5]/g) || [];
+        }
+
+        function determineType(characters) {
+            return characters.length === 20 ? "五言" : "七言";
+        }
+
+        // 构建最终poems数组
+        const poems = rawPoems.map(raw => {
+            const chars = extractCharacters(raw.text);
+            return {
+                title: raw.title,
+                author: raw.author,
+                type: determineType(chars),
+                text: raw.text,
+                characters: chars
+            };
+        });
+
+        // ---------- DOM 元素 ----------
+        const poemSelect = document.getElementById('poemSelect');
+        const gridContainer = document.getElementById('gridContainer');
+        const currentTimeSpan = document.getElementById('currentTimeDisplay');
+        const bestTimeSpan = document.getElementById('bestTimeDisplay');
+        const restartBtn = document.getElementById('restartBtn');
+        const newGameBtn = document.getElementById('newGameBtn');
+        const poemDisplayDiv = document.getElementById('poemDisplay');
+
+        // ---------- 游戏状态 ----------
+        let currentPoem = null;
+        let currentGridItems = [];
+        let expectedIndex = 0;
+        let gameCompleted = false;
+        let timerRunning = false;
+        let startTime = 0;
+        let timerInterval = null;
+        let currentElapsedSeconds = 0;
+        let totalCharsCount = 0;
+        let highlightSpans = [];
+
+        function getBestKey() {
+            return `poem_best_${currentPoem.title}`;
+        }
+
+        // ---------- Web Audio ----------
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            return audioCtx;
+        }
+        async function playBeep() {
+            try {
+                const ctx = getAudioContext();
+                if (ctx.state === 'suspended') await ctx.resume();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 880;
+                gain.gain.value = 0.25;
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(now + 0.12);
+            } catch(e) {}
+        }
+        async function playCelebration() {
+            try {
+                const ctx = getAudioContext();
+                if (ctx.state === 'suspended') await ctx.resume();
+                const now = ctx.currentTime;
+                const notes = [523.25, 659.25, 783.99];
+                for (let i = 0; i < notes.length; i++) {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = notes[i];
+                    gain.gain.value = 0.2;
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25 + i * 0.12);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + i * 0.12);
+                    osc.stop(now + i * 0.12 + 0.2);
+                }
+                const oscLast = ctx.createOscillator();
+                const gainLast = ctx.createGain();
+                oscLast.type = 'triangle';
+                oscLast.frequency.value = 1046.5;
+                gainLast.gain.value = 0.12;
+                gainLast.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+                oscLast.connect(gainLast);
+                gainLast.connect(ctx.destination);
+                oscLast.start(now + 0.4);
+                oscLast.stop(now + 0.7);
+            } catch(e) {}
+        }
+
+        function updateTimerDisplay(seconds) {
+            currentTimeSpan.textContent = seconds.toFixed(2);
+        }
+        function stopTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+            timerRunning = false;
+        }
+        function startTimer() {
+            if (timerInterval) stopTimer();
+            startTime = performance.now();
+            timerRunning = true;
+            timerInterval = setInterval(() => {
+                if (!timerRunning || gameCompleted) return;
+                currentElapsedSeconds = (performance.now() - startTime) / 1000;
+                updateTimerDisplay(currentElapsedSeconds);
+            }, 30);
+        }
+        function updateBestDisplay() {
+            if (!currentPoem) return;
+            const stored = localStorage.getItem(getBestKey());
+            if (stored !== null && !isNaN(parseFloat(stored))) {
+                bestTimeSpan.textContent = parseFloat(stored).toFixed(2) + 's';
+            } else {
+                bestTimeSpan.textContent = '——';
+            }
+        }
+        function finishGame() {
+            if (gameCompleted) return;
+            gameCompleted = true;
+            if (timerRunning) stopTimer();
+            const finalSeconds = currentElapsedSeconds;
+            playCelebration();
+            const bestKey = getBestKey();
+            let best = localStorage.getItem(bestKey);
+            let isNewRecord = false;
+            if (best === null || finalSeconds < parseFloat(best)) {
+                isNewRecord = true;
+                localStorage.setItem(bestKey, finalSeconds.toFixed(3));
+                updateBestDisplay();
+            }
+            let message = `🎉 完成《${currentPoem.title}》！\n⏱️ 用时：${finalSeconds.toFixed(2)} 秒`;
+            if (isNewRecord) message += `\n✨ 刷新本诗纪录！ ✨`;
+            alert(message);
+        }
+        function handleCorrectClick(cardElement) {
+            cardElement.classList.add('card-correct');
+            setTimeout(() => cardElement.classList.remove('card-correct'), 150);
+            playBeep();
+            if (expectedIndex < highlightSpans.length) {
+                highlightSpans[expectedIndex].classList.add('highlight');
+            }
+            expectedIndex++;
+            if (expectedIndex === totalCharsCount) {
+                finishGame();
+            }
+        }
+        function onGridClick(e) {
+            let target = e.target.closest('.card');
+            if (!target || gameCompleted) return;
+            if (target.classList.contains('card-empty')) return;
+            const val = target.getAttribute('data-value');
+            if (!val) return;
+            if (expectedIndex >= totalCharsCount) return;
+            const expectedChar = currentPoem.characters[expectedIndex];
+            if (val !== expectedChar) return;
+            if (!timerRunning && expectedIndex === 0) startTimer();
+            handleCorrectClick(target);
+        }
+
+        function buildShuffledGrid() {
+            let items = [];
+            if (currentPoem.type === "五言") {
+                items = [...currentPoem.characters];
+            } else {
+                items = [...currentPoem.characters];
+                while (items.length < 30) items.push('');
+            }
+            for (let i = items.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [items[i], items[j]] = [items[j], items[i]];
+            }
+            return items;
+        }
+
+        function renderGrid() {
+            if (!gridContainer) return;
+            gridContainer.style.display = 'grid';
+            gridContainer.style.gridTemplateColumns = `repeat(5, 1fr)`;
+            gridContainer.style.gap = '10px';
+            gridContainer.innerHTML = '';
+            for (let val of currentGridItems) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                if (val === '') {
+                    card.classList.add('card-empty');
+                    card.textContent = '';
+                } else {
+                    card.textContent = val;
+                    card.setAttribute('data-value', val);
+                }
+                gridContainer.appendChild(card);
+            }
+        }
+
+        function renderPoemText() {
+            if (!poemDisplayDiv) return;
+            const lines = currentPoem.text.split(/[，。？！；：]/).filter(l => l.trim().length > 0);
+            poemDisplayDiv.innerHTML = '';
+            highlightSpans = [];
+            let charIdx = 0;
+            for (let line of lines) {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'poem-line';
+                for (let ch of line) {
+                    if (/[\u4e00-\u9fa5]/.test(ch)) {
+                        const span = document.createElement('span');
+                        span.className = 'poem-char';
+                        span.textContent = ch;
+                        lineDiv.appendChild(span);
+                        highlightSpans.push(span);
+                        charIdx++;
+                    } else {
+                        lineDiv.appendChild(document.createTextNode(ch));
+                    }
+                }
+                poemDisplayDiv.appendChild(lineDiv);
+            }
+        }
+
+        function resetHighlights() {
+            for (let span of highlightSpans) span.classList.remove('highlight');
+        }
+
+        function resetGameState(keepLayout = true) {
+            stopTimer();
+            timerRunning = false;
+            gameCompleted = false;
+            expectedIndex = 0;
+            currentElapsedSeconds = 0;
+            updateTimerDisplay(0);
+            if (!keepLayout) {
+                currentGridItems = buildShuffledGrid();
+                renderGrid();
+            }
+            resetHighlights();
+        }
+
+        function restartGame() {
+            if (!currentPoem) return;
+            resetGameState(true);
+        }
+
+        function newGame() {
+            if (!currentPoem) return;
+            currentGridItems = buildShuffledGrid();
+            renderGrid();
+            resetGameState(false);
+        }
+
+        function switchPoem() {
+            const selectedTitle = poemSelect.value;
+            const newPoem = poems.find(p => p.title === selectedTitle);
+            if (!newPoem) return;
+            currentPoem = newPoem;
+            totalCharsCount = currentPoem.characters.length;
+            currentGridItems = buildShuffledGrid();
+            renderGrid();
+            renderPoemText();
+            stopTimer();
+            timerRunning = false;
+            gameCompleted = false;
+            expectedIndex = 0;
+            currentElapsedSeconds = 0;
+            updateTimerDisplay(0);
+            resetHighlights();
+            updateBestDisplay();
+        }
+
+        function initPoemSelect() {
+            poemSelect.innerHTML = '';
+            poems.forEach(poem => {
+                const option = document.createElement('option');
+                option.value = poem.title;
+                option.textContent = `${poem.title} (${poem.author}) ${poem.type}`;
+                poemSelect.appendChild(option);
+            });
+            poemSelect.addEventListener('change', switchPoem);
+            if (poems.length) {
+                poemSelect.value = poems[0].title;
+                currentPoem = poems[0];
+                totalCharsCount = currentPoem.characters.length;
+                currentGridItems = buildShuffledGrid();
+                renderGrid();
+                renderPoemText();
+                updateBestDisplay();
+            }
+        }
+
+        function bindEvents() {
+            gridContainer.addEventListener('click', onGridClick);
+            restartBtn.addEventListener('click', restartGame);
+            newGameBtn.addEventListener('click', newGame);
+        }
+
+        function unlockAudioOnFirstTouch() {
+            const handler = async () => {
+                if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+                else if (!audioCtx) {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (ctx.state === 'suspended') await ctx.resume();
+                    audioCtx = ctx;
+                    if (audioCtx.state === 'running') await audioCtx.suspend();
+                }
+                document.body.removeEventListener('touchstart', handler);
+                document.body.removeEventListener('mousedown', handler);
+            };
+            document.body.addEventListener('touchstart', handler, { once: true });
+            document.body.addEventListener('mousedown', handler, { once: true });
+        }
+
+        initPoemSelect();
+        bindEvents();
+        unlockAudioOnFirstTouch();
+    })();
+</script>
+</body>
+</html>
