@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>手账工坊 · 组合打印模板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #fbf5ef;  /* 奶粉色基调，暖白护眼 */
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Noto Sans', sans-serif;
+            padding: 24px 20px;
+            color: #3e2c23;
+        }
+
+        /* 主容器 */
+        .app {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 500;
+            letter-spacing: -0.3px;
+            color: #b97f5c;
+            border-left: 5px solid #e5c7b5;
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* 控制栏卡片 */
+        .toolbar {
+            background: #fffaf5;
+            border-radius: 32px;
+            padding: 20px 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.03);
+            border: 1px solid #f0e2d6;
+        }
+
+        .select-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 24px;
+            justify-content: space-between;
+        }
+
+        .paper-size {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f7ede6;
+            padding: 8px 18px;
+            border-radius: 48px;
+        }
+
+        .paper-size label {
+            font-weight: 500;
+            color: #aa7757;
+        }
+
+        select {
+            background: white;
+            border: 1px solid #e2cfc0;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #4f3424;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        select:focus {
+            border-color: #dbb294;
+            box-shadow: 0 0 0 2px rgba(219, 178, 148, 0.2);
+        }
+
+        .btn-generate {
+            background: #e5c7b5;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 48px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #553b2a;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .btn-generate:hover {
+            background: #dbb294;
+            transform: translateY(-1px);
+        }
+
+        .btn-print {
+            background: #d7cdc1;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 48px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #553b2a;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-print:hover {
+            background: #cbbaa8;
+        }
+
+        /* 模板网格（选择区） */
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding: 6px 4px;
+        }
+
+        .template-card {
+            background: white;
+            border-radius: 24px;
+            padding: 12px 14px;
+            border: 1px solid #f0dfd2;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .template-card:hover {
+            background: #fff7f0;
+            border-color: #e2cbbc;
+        }
+
+        .template-card input {
+            width: 20px;
+            height: 20px;
+            accent-color: #b97f5c;
+            cursor: pointer;
+        }
+
+        .template-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* 预览区域 */
+        .preview-container {
+            background: #fef9f4;
+            border-radius: 32px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid #eedfcb;
+            margin-top: 20px;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #edd9c9;
+        }
+
+        .preview-header h2 {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #b77e5c;
+        }
+
+        /* 生成的笔记页面区域 (模拟纸张) */
+        .print-pages {
+            background: #fefaf5;
+            border-radius: 16px;
+            transition: all 0.1s;
+        }
+
+        /* 每个模板为一个独立板块，打印时分页 */
+        .template-block {
+            margin-bottom: 30px;
+            page-break-after: always;
+            break-inside: avoid;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+            padding: 20px 24px;
+        }
+
+        .template-block:last-child {
+            page-break-after: auto;
+            margin-bottom: 0;
+        }
+
+        /* 纸张大小适配 (主要影响打印时的尺寸) 屏幕预览保持舒适比例 */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .toolbar, .preview-header, .btn-generate, .btn-print, .templates-grid, h1 {
+                display: none;
+            }
+            .preview-container {
+                padding: 0;
+                margin: 0;
+                background: white;
+                border: none;
+                box-shadow: none;
+            }
+            .print-pages {
+                background: white;
+            }
+            .template-block {
+                box-shadow: none;
+                padding: 0.8cm;
+                margin: 0;
+                border-radius: 0;
+            }
+            /* 强制背景色打印（可选，纸张自带底色） */
+            body, .template-block, .print-pages {
+                background: white;
+            }
+        }
+
+        /* 屏幕模拟不同纸张风格 (视觉反馈) */
+        .print-pages[data-paper="A4"] .template-block {
+            max-width: 210mm;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .print-pages[data-paper="A5"] .template-block {
+            max-width: 148mm;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .print-pages[data-paper="A6"] .template-block {
+            max-width: 105mm;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .print-pages[data-paper="A7"] .template-block {
+            max-width: 74mm;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .print-pages[data-paper="B5"] .template-block {
+            max-width: 176mm;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 通用表格、线条样式，让打印排版干净 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+        th, td {
+            border: 1px solid #e9d9ce;
+            padding: 8px 6px;
+            vertical-align: top;
+        }
+        .blank-line {
+            border-bottom: 1px dashed #dccbbc;
+            min-height: 28px;
+            margin: 8px 0;
+        }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 6px 0;
+        }
+        .check-item:before {
+            content: "□";
+            font-size: 1.1rem;
+            color: #b97f5c;
+        }
+        .grid-calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin: 12px 0;
+        }
+        .calendar-day {
+            border: 1px solid #edd9ca;
+            padding: 8px 4px;
+            min-height: 60px;
+            font-size: 0.85rem;
+        }
+        hr {
+            border: none;
+            border-top: 2px dotted #ebd9cd;
+            margin: 16px 0;
+        }
+        .section-title {
+            font-weight: 600;
+            margin: 12px 0 6px 0;
+            color: #b27a58;
+            font-size: 1rem;
+        }
+        /* 针对小纸张缩紧间距 */
+        @media (max-width: 600px) {
+            .template-block {
+                padding: 14px;
+            }
+            .calendar-day {
+                min-height: 45px;
+                font-size: 0.7rem;
+            }
+        }
+        .footnote {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 20px;
+            color: #c7aa93;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <h1>📒 手账工坊 · 自由组合打印</h1>
+    <div class="toolbar">
+        <div class="select-row">
+            <div class="paper-size">
+                <label>📄 纸张大小</label>
+                <select id="paperSizeSelect">
+                    <option value="A4">A4 (210×297mm)</option>
+                    <option value="A5">A5 (148×210mm)</option>
+                    <option value="A6">A6 (105×148mm)</option>
+                    <option value="A7">A7 (74×105mm)</option>
+                    <option value="B5">B5 (176×250mm)</option>
+                </select>
+            </div>
+            <div>
+                <button class="btn-generate" id="generateBtn">✨ 生成组合页面</button>
+                <button class="btn-print" id="printBtn" style="margin-left: 12px;">🖨️ 打印 / 另存为PDF</button>
+            </div>
+        </div>
+        <div style="font-weight: 500; margin-bottom: 12px;">📌 选择你需要的手账笔记类型 (可多选)</div>
+        <div class="templates-grid" id="templatesList"></div>
+        <div class="footnote" style="margin-top: 12px;">✔ 点击「生成组合页面」即可预览，再打印或保存PDF，纸张尺寸将在打印时生效</div>
+    </div>
+
+    <div class="preview-container">
+        <div class="preview-header">
+            <h2>📖 你的手账本预览</h2>
+            <span style="font-size: 0.75rem; color: #b78f73;">👇 每个模板自动分页，可直接打印</span>
+        </div>
+        <div id="printPages" class="print-pages" data-paper="A4">
+            <!-- 动态生成内容 -->
+            <div style="text-align: center; padding: 60px 20px; color: #cfb49c;">✨ 请选择模板并点击「生成组合页面」</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- 定义所有模板 (HTML生成函数，纯结构，适配不同纸张) ----------
+    const templates = [
+        { id: "year_plan", name: "📅 年计划页", getHtml: () => `
+            <div class="section-title">🎯 全年概览 · 里程碑</div>
+            <div style="display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;">
+                ${Array.from({length:12}, (_,i)=>`<div style="border:1px solid #efddcf; padding:6px;"><strong>${i+1}月</strong><div style="height:45px; border-bottom:1px dashed #e6cfbe; margin:5px 0;"></div><span style="font-size:0.7rem;">重要事项</span><div style="height:30px;"></div></div>`).join('')}
+            </div>
+            <div class="blank-line"></div>
+            <div>📌 年度关键词：____________________  三大目标：1.________ 2.________ 3.________</div>
+        ` },
+        { id: "month_plan", name: "📆 月计划页", getHtml: () => `
+            <div class="section-title">📆 ____年____月 计划 & 习惯</div>
+            <div class="grid-calendar">
+                ${['日','一','二','三','四','五','六'].map(d=>`<div style="font-weight:bold; text-align:center;">${d}</div>`).join('')}
+                ${Array.from({length:35}, (_,i)=>`<div class="calendar-day">${i+1<=31?i+1:''}<div style="height:28px;"></div></div>`).slice(0,35).join('')}
+            </div>
+            <div style="display: flex; gap: 20px; margin-top: 12px;">
+                <div style="flex:1"><strong>本月目标</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+                <div style="flex:1"><strong>习惯打卡</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+            </div>
+        ` },
+        { id: "week_vertical", name: "⏰ 周计划·竖式时间轴", getHtml: () => `
+            <div class="section-title">📋 周计划（竖式时间轴） 日期：______ 至 ______</div>
+            <table style="font-size:0.85rem;">
+                <thead><tr><th>时间</th><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th><th>周六</th><th>周日</th></tr></thead>
+                <tbody>
+                    ${Array.from({length:12}, (_,i)=>`<tr><td>${7+i}:00</td>${'<td></td>'.repeat(7)}</tr>`).join('')}
+                </tbody>
+            </table>
+            <div class="blank-line"></div>
+            <div>📌 本周重要任务：________________________</div>
+        ` },
+        { id: "week_horizontal", name: "📋 周计划·横式任务版", getHtml: () => `
+            <div class="section-title">📋 周计划 · 任务清单</div>
+            <table>
+                <thead><tr><th>周一</th><th>周二</th><th>周三</th><th>周四</th><th>周五</th><th>周六</th><th>周日</th></tr></thead>
+                <tbody><tr>${'<td style="height:120px; vertical-align:top;">□ <br>□ <br>□ <br></td>'.repeat(7)}</tr></tbody>
+            </table>
+            <div>⭐ 本周重点：_________________________________</div>
+        ` },
+        { id: "daily_plan", name: "✍️ 日计划页", getHtml: () => `
+            <div class="section-title">📅 日计划 · 日期：___________ 星期____</div>
+            <div style="display: flex; gap: 16px; flex-wrap:wrap;">
+                <div style="flex:2; min-width: 180px;"><strong>⏱️ 时间轴</strong><br>
+                    ${Array.from({length:14}, (_,i)=>`${8+i}:00 — ${9+i}:00  ________________________<br>`).join('')}
+                </div>
+                <div style="flex:1; min-width: 140px;"><strong>✅ 优先事项</strong><div class="check-item"></div><div class="check-item"></div><div class="check-item"></div>
+                <strong>📝 其他任务</strong><div class="check-item"></div><div class="check-item"></div></div>
+            </div>
+            <div><strong>✨ 感恩/复盘</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+        ` },
+        { id: "timelog", name: "⌛ 时间轴日志", getHtml: () => `
+            <div class="section-title">⏳ 时间追踪日志 日期：__________</div>
+            <table>
+                <thead><tr><th>时段</th><th>活动内容</th><th>类别(工作/学习/生活)</th><th>耗时</th></tr></thead>
+                <tbody>${Array.from({length:10}, (_,i)=>`<tr><td>${8+i}:00-${9+i}:00</td><td></td><td></td><td></td></tr>`).join('')}</tbody>
+            </table>
+            <div>📊 总结与偏差：_________________________________</div>
+        ` },
+        { id: "year_review", name: "📎 年复盘页", getHtml: () => `
+            <div class="section-title">📌 年度复盘 · 20____年</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div><strong>🎉 大事记</strong><div class="blank-line"></div><div class="blank-line"></div><div class="blank-line"></div></div>
+                <div><strong>📊 年度数据</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+                <div><strong>💖 感恩/高光</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+                <div><strong>🚀 明年展望</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+            </div>
+        ` },
+        { id: "cornell", name: "📖 康奈尔笔记法", getHtml: () => `
+            <div class="section-title">📘 康奈尔笔记</div>
+            <div style="display: flex; border: 1px solid #edd3c2; min-height: 220px;">
+                <div style="width: 30%; border-right: 1px solid #edd3c2; padding: 8px;"><strong>线索/关键词</strong><br><br><br><br><br><br></div>
+                <div style="width: 70%; padding: 8px;"><strong>笔记区</strong><br><br><br><br><br><br><br></div>
+            </div>
+            <div style="border: 1px solid #edd3c2; padding: 10px; margin-top: 8px;"><strong>📌 总结（核心观点）</strong><br><br></div>
+        ` },
+        { id: "empty_rain_umbrella", name: "☔ 麦肯锡·空雨伞", getHtml: () => `
+            <div class="section-title">🌫️ 空（事实）· 雨（解释）· 伞（行动）</div>
+            <div><strong>空（事实）</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+            <div><strong>雨（解释/意义）</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+            <div><strong>伞（对策/行动）</strong><div class="blank-line"></div><div class="blank-line"></div></div>
+        ` },
+        { id: "mindmap", name: "🧠 思维导图（留白）", getHtml: () => `
+            <div class="section-title">🧩 思维导图 · 中心主题：_________________</div>
+            <div style="height: 180px; border: 2px dotted #eedbcb; border-radius: 24px; display: flex; align-items: center; justify-content: center; background: #fef7f0;">
+                ⚡ 在此处手绘思维导图（分支、关键词）
+            </div>
+            <div style="margin-top: 10px; display: flex; gap: 10px;"><span>一级分支：</span><span class="blank-line" style="flex:1"></span></div>
+        ` },
+        { id: "cardbox", name: "🗂️ 卡片盒笔记（可裁剪）", getHtml: () => `
+            <div class="section-title">📇 独立卡片（沿虚线裁剪）</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                ${Array.from({length:4}, (_,i)=>`<div style="border:2px dashed #e2cdbc; padding: 12px; border-radius: 16px;"><strong>卡片 ${i+1}</strong><br>编号：________<br>主题：________<br>内容：<div style="height:60px;"></div>🔗 链接卡片：____</div>`).join('')}
+            </div>
+            <div class="footnote">✂️ 打印后可剪裁成独立卡片，用于知识连接</div>
+        ` },
+        { id: "golden_circle", name: "🥇 黄金圈法则", getHtml: () => `
+            <div class="section-title">💡 黄金圈 · Why / How / What</div>
+            <div style="text-align: center; margin: 12px 0;">
+                <div style="border-radius: 50%; border: 2px solid #e4cfbf; width: 80px; height: 80px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">WHY</div>
+                <div style="border-radius: 50%; border: 2px solid #e4cfbf; width: 140px; height: 140px; margin: -50px auto 0; display: flex; align-items: center; justify-content: center;">HOW</div>
+                <div style="border-radius: 50%; border: 2px solid #e4cfbf; width: 200px; height: 200px; margin: -60px auto 0; display: flex; align-items: center; justify-content: center;">WHAT</div>
+            </div>
+            <div>Why: ___________________________<br>How: ___________________________<br>What: __________________________</div>
+        ` },
+        { id: "kpt", name: "🔄 KPT复盘法", getHtml: () => `
+            <div class="section-title">🔁 KPT复盘 (Keep / Problem / Try)</div>
+            <div style="display: flex; gap: 12px; margin-top: 12px;">
+                <div style="flex:1; border:1px solid #e2cdbc; padding: 8px;"><strong>✅ Keep</strong><br><div class="blank-line"></div><div class="blank-line"></div></div>
+                <div style="flex:1; border:1px solid #e2cdbc; padding: 8px;"><strong>⚠️ Problem</strong><br><div class="blank-line"></div><div class="blank-line"></div></div>
+                <div style="flex:1; border:1px solid #e2cdbc; padding: 8px;"><strong>🚀 Try</strong><br><div class="blank-line"></div><div class="blank-line"></div></div>
+            </div>
+        ` },
+        { id: "five_w1h", name: "❓ 5W1H分析法", getHtml: () => `
+            <div class="section-title">5W1H · 结构化分析</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div><strong>Who</strong><div class="blank-line"></div></div><div><strong>What</strong><div class="blank-line"></div></div>
+                <div><strong>When</strong><div class="blank-line"></div></div><div><strong>Where</strong><div class="blank-line"></div></div>
+                <div><strong>Why</strong><div class="blank-line"></div></div><div><strong>How</strong><div class="blank-line"></div></div>
+            </div>
+        ` }
+    ];
+
+    // 渲染模板选择列表
+    function renderTemplateList() {
+        const container = document.getElementById('templatesList');
+        container.innerHTML = '';
+        templates.forEach((tpl, idx) => {
+            const card = document.createElement('label');
+            card.className = 'template-card';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = tpl.id;
+            cb.checked = true;   // 默认全选便于体验
+            const span = document.createElement('span');
+            span.className = 'template-name';
+            span.innerText = tpl.name;
+            card.appendChild(cb);
+            card.appendChild(span);
+            container.appendChild(card);
+        });
+    }
+
+    // 获取选中的模板ID列表 (保持顺序)
+    function getSelectedTemplates() {
+        const checkboxes = document.querySelectorAll('#templatesList input');
+        const selected = [];
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                const tpl = templates.find(t => t.id === cb.value);
+                if (tpl) selected.push(tpl);
+            }
+        });
+        return selected;
+    }
+
+    // 生成组合页面
+    function generatePages() {
+        const selected = getSelectedTemplates();
+        const paperSize = document.getElementById('paperSizeSelect').value;
+        const container = document.getElementById('printPages');
+        container.setAttribute('data-paper', paperSize);
+        
+        if (selected.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 40px; color: #b98f6e;">⚠️ 请至少选择一种笔记类型</div>';
+            return;
+        }
+        
+        let html = '';
+        selected.forEach((tpl, index) => {
+            html += `<div class="template-block">${tpl.getHtml()}<div style="font-size: 0.7rem; text-align: right; margin-top: 16px; color: #cfb49c;">—— ${tpl.name} ——</div></div>`;
+        });
+        container.innerHTML = html;
+        
+        // 添加打印时的纸张尺寸控制
+        updatePrintPaperSize(paperSize);
+    }
+    
+    // 动态注入打印样式（设置@page大小）
+    function updatePrintPaperSize(paper) {
+        let sizeCSS = '';
+        switch(paper) {
+            case 'A4': sizeCSS = 'A4'; break;
+            case 'A5': sizeCSS = 'A5'; break;
+            case 'A6': sizeCSS = 'A6'; break;
+            case 'A7': sizeCSS = 'A7'; break;
+            case 'B5': sizeCSS = 'B5'; break;
+            default: sizeCSS = 'A4';
+        }
+        let styleTag = document.getElementById('dynamicPrintStyle');
+        if (!styleTag) {
+            styleTag = document.createElement('style');
+            styleTag.id = 'dynamicPrintStyle';
+            document.head.appendChild(styleTag);
+        }
+        styleTag.textContent = `@media print { @page { size: ${sizeCSS}; margin: 1.5cm; } body { margin: 0; } }`;
+    }
+    
+    // 打印功能
+    function handlePrint() {
+        // 确保打印前生成最新内容
+        generatePages();
+        setTimeout(() => {
+            window.print();
+        }, 100);
+    }
+    
+    // 初始化界面及事件绑定
+    function init() {
+        renderTemplateList();
+        // 默认生成一次预览
+        generatePages();
+        document.getElementById('generateBtn').addEventListener('click', generatePages);
+        document.getElementById('printBtn').addEventListener('click', handlePrint);
+        // 纸张切换时重新生成（便于预览调整容器宽度）
+        document.getElementById('paperSizeSelect').addEventListener('change', () => {
+            generatePages();
+        });
+    }
+    
+    init();
+</script>
+</body>
+</html>
