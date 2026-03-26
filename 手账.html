@@ -12,19 +12,17 @@
         }
 
         body {
-            background: #fbf5ef;  /* 奶粉色基调，暖白护眼 */
+            background: #fbf5ef;
             font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Noto Sans', sans-serif;
             padding: 24px 20px;
             color: #3e2c23;
         }
 
-        /* 主容器 */
         .app {
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        /* 头部 */
         h1 {
             font-size: 1.8rem;
             font-weight: 500;
@@ -35,7 +33,6 @@
             margin-bottom: 20px;
         }
 
-        /* 控制栏卡片 */
         .toolbar {
             background: #fffaf5;
             border-radius: 32px;
@@ -45,55 +42,15 @@
             border: 1px solid #f0e2d6;
         }
 
+        /* 关键：纸张选择器和按钮组布局 */
         .select-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;  /* 改为顶部对齐，避免换行后错位 */
-    gap: 20px;
-    margin-bottom: 24px;
-    justify-content: space-between;
-}
-
-/* 按钮组内部也支持换行 */
-.select-row > div:last-child {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-/* 移动端优化：当屏幕宽度小于 550px 时，让两个主要块垂直排列并左对齐 */
-@media (max-width: 550px) {
-    .select-row {
-        flex-direction: column;
-        align-items: stretch;  /* 子元素宽度占满 */
-        gap: 16px;
-    }
-    
-    .paper-size {
-        justify-content: space-between; /* 让标签和下拉框两端对齐，视觉更均衡 */
-        width: 100%;
-    }
-    
-    .select-row > div:last-child {
-        justify-content: flex-start;  /* 按钮左对齐 */
-        width: 100%;
-    }
-    
-    /* 可选：让两个按钮占满一定宽度但不要撑满整行，保持紧凑左对齐 */
-    .btn-generate, .btn-print {
-        /* 如果希望按钮宽度自动，保留原有padding即可 */
-        flex: 0 0 auto;
-    }
-}
-    
-    .paper-size {
-        justify-content: space-between;
-    }
-    
-    .select-row > div:last-child {
-        justify-content: flex-start; /* 按钮左对齐 */
-    }
-}
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+            justify-content: space-between;
+        }
 
         .paper-size {
             display: flex;
@@ -104,9 +61,10 @@
             border-radius: 48px;
         }
 
-        .paper-size label {
-            font-weight: 500;
-            color: #aa7757;
+        .select-row > div:last-child {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         select {
@@ -127,7 +85,7 @@
             box-shadow: 0 0 0 2px rgba(219, 178, 148, 0.2);
         }
 
-        .btn-generate {
+        .btn-generate, .btn-print {
             background: #e5c7b5;
             border: none;
             padding: 10px 28px;
@@ -140,28 +98,20 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        .btn-generate:hover {
-            background: #dbb294;
-            transform: translateY(-1px);
-        }
-
         .btn-print {
             background: #d7cdc1;
-            border: none;
-            padding: 10px 28px;
-            border-radius: 48px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #553b2a;
-            cursor: pointer;
-            transition: 0.2s;
+        }
+
+        .btn-generate:hover, .btn-print:hover {
+            transform: translateY(-1px);
+            background: #dbb294;
         }
 
         .btn-print:hover {
             background: #cbbaa8;
         }
 
-        /* 模板网格（选择区） */
+        /* 模板选择网格 */
         .templates-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -202,7 +152,7 @@
             font-weight: 500;
         }
 
-        /* 预览区域 */
+        /* 预览区 */
         .preview-container {
             background: #fef9f4;
             border-radius: 32px;
@@ -229,14 +179,11 @@
             color: #b77e5c;
         }
 
-        /* 生成的笔记页面区域 (模拟纸张) */
         .print-pages {
             background: #fefaf5;
             border-radius: 16px;
-            transition: all 0.1s;
         }
 
-        /* 每个模板为一个独立板块，打印时分页 */
         .template-block {
             margin-bottom: 30px;
             page-break-after: always;
@@ -252,7 +199,7 @@
             margin-bottom: 0;
         }
 
-        /* 纸张大小适配 (主要影响打印时的尺寸) 屏幕预览保持舒适比例 */
+        /* 打印样式 */
         @media print {
             body {
                 background: white;
@@ -278,104 +225,45 @@
                 margin: 0;
                 border-radius: 0;
             }
-            /* 强制背景色打印（可选，纸张自带底色） */
-            body, .template-block, .print-pages {
-                background: white;
-            }
         }
 
-        /* 屏幕模拟不同纸张风格 (视觉反馈) */
-        .print-pages[data-paper="A4"] .template-block {
-            max-width: 210mm;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .print-pages[data-paper="A5"] .template-block {
-            max-width: 148mm;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .print-pages[data-paper="A6"] .template-block {
-            max-width: 105mm;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .print-pages[data-paper="A7"] .template-block {
-            max-width: 74mm;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .print-pages[data-paper="B5"] .template-block {
-            max-width: 176mm;
-            margin-left: auto;
-            margin-right: auto;
-        }
+        /* 屏幕模拟纸张宽度 */
+        .print-pages[data-paper="A4"] .template-block { max-width: 210mm; margin-left: auto; margin-right: auto; }
+        .print-pages[data-paper="A5"] .template-block { max-width: 148mm; margin-left: auto; margin-right: auto; }
+        .print-pages[data-paper="A6"] .template-block { max-width: 105mm; margin-left: auto; margin-right: auto; }
+        .print-pages[data-paper="A7"] .template-block { max-width: 74mm; margin-left: auto; margin-right: auto; }
+        .print-pages[data-paper="B5"] .template-block { max-width: 176mm; margin-left: auto; margin-right: auto; }
 
-        /* 通用表格、线条样式，让打印排版干净 */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 12px 0;
-        }
-        th, td {
-            border: 1px solid #e9d9ce;
-            padding: 8px 6px;
-            vertical-align: top;
-        }
-        .blank-line {
-            border-bottom: 1px dashed #dccbbc;
-            min-height: 28px;
-            margin: 8px 0;
-        }
-        .check-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 6px 0;
-        }
-        .check-item:before {
-            content: "□";
-            font-size: 1.1rem;
-            color: #b97f5c;
-        }
-        .grid-calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
-            margin: 12px 0;
-        }
-        .calendar-day {
-            border: 1px solid #edd9ca;
-            padding: 8px 4px;
-            min-height: 60px;
-            font-size: 0.85rem;
-        }
-        hr {
-            border: none;
-            border-top: 2px dotted #ebd9cd;
-            margin: 16px 0;
-        }
-        .section-title {
-            font-weight: 600;
-            margin: 12px 0 6px 0;
-            color: #b27a58;
-            font-size: 1rem;
-        }
-        /* 针对小纸张缩紧间距 */
-        @media (max-width: 600px) {
-            .template-block {
-                padding: 14px;
+        /* 通用内容样式 */
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+        th, td { border: 1px solid #e9d9ce; padding: 8px 6px; vertical-align: top; }
+        .blank-line { border-bottom: 1px dashed #dccbbc; min-height: 28px; margin: 8px 0; }
+        .check-item { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+        .check-item:before { content: "□"; font-size: 1.1rem; color: #b97f5c; }
+        .grid-calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 12px 0; }
+        .calendar-day { border: 1px solid #edd9ca; padding: 8px 4px; min-height: 60px; font-size: 0.85rem; }
+        hr { border: none; border-top: 2px dotted #ebd9cd; margin: 16px 0; }
+        .section-title { font-weight: 600; margin: 12px 0 6px 0; color: #b27a58; font-size: 1rem; }
+        .footnote { font-size: 0.7rem; text-align: center; margin-top: 20px; color: #c7aa93; }
+
+        /* ========== 移动端修复：左对齐 ========== */
+        @media (max-width: 550px) {
+            .select-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
             }
-            .calendar-day {
-                min-height: 45px;
-                font-size: 0.7rem;
+            .paper-size {
+                width: 100%;
+                justify-content: space-between;  /* 纸张选择器两端对齐，美观 */
             }
-        }
-        .footnote {
-            font-size: 0.7rem;
-            text-align: center;
-            margin-top: 20px;
-            color: #c7aa93;
+            .select-row > div:last-child {
+                width: 100%;
+                justify-content: flex-start;   /* 按钮左对齐，关键 */
+                gap: 12px;
+            }
+            /* 可选：如果希望按钮宽度一致且并排，取消下面注释，但会失去左对齐感，按需求保留左对齐 */
+            /* .btn-generate, .btn-print { flex: 1; text-align: center; } */
         }
     </style>
 </head>
@@ -396,7 +284,7 @@
             </div>
             <div>
                 <button class="btn-generate" id="generateBtn">✨ 生成组合页面</button>
-                <button class="btn-print" id="printBtn" style="margin-left: 12px;">🖨️ 打印 / 另存为PDF</button>
+                <button class="btn-print" id="printBtn">🖨️ 打印 / 另存为PDF</button>
             </div>
         </div>
         <div style="font-weight: 500; margin-bottom: 12px;">📌 选择你需要的手账笔记类型 (可多选)</div>
@@ -410,14 +298,13 @@
             <span style="font-size: 0.75rem; color: #b78f73;">👇 每个模板自动分页，可直接打印</span>
         </div>
         <div id="printPages" class="print-pages" data-paper="A4">
-            <!-- 动态生成内容 -->
             <div style="text-align: center; padding: 60px 20px; color: #cfb49c;">✨ 请选择模板并点击「生成组合页面」</div>
         </div>
     </div>
 </div>
 
 <script>
-    // ---------- 定义所有模板 (HTML生成函数，纯结构，适配不同纸张) ----------
+    // ---------- 定义所有模板 ----------
     const templates = [
         { id: "year_plan", name: "📅 年计划页", getHtml: () => `
             <div class="section-title">🎯 全年概览 · 里程碑</div>
@@ -540,17 +427,16 @@
         ` }
     ];
 
-    // 渲染模板选择列表
     function renderTemplateList() {
         const container = document.getElementById('templatesList');
         container.innerHTML = '';
-        templates.forEach((tpl, idx) => {
+        templates.forEach((tpl) => {
             const card = document.createElement('label');
             card.className = 'template-card';
             const cb = document.createElement('input');
             cb.type = 'checkbox';
             cb.value = tpl.id;
-            cb.checked = true;   // 默认全选便于体验
+            cb.checked = true;
             const span = document.createElement('span');
             span.className = 'template-name';
             span.innerText = tpl.name;
@@ -560,7 +446,6 @@
         });
     }
 
-    // 获取选中的模板ID列表 (保持顺序)
     function getSelectedTemplates() {
         const checkboxes = document.querySelectorAll('#templatesList input');
         const selected = [];
@@ -573,7 +458,6 @@
         return selected;
     }
 
-    // 生成组合页面
     function generatePages() {
         const selected = getSelectedTemplates();
         const paperSize = document.getElementById('paperSizeSelect').value;
@@ -586,16 +470,13 @@
         }
         
         let html = '';
-        selected.forEach((tpl, index) => {
+        selected.forEach((tpl) => {
             html += `<div class="template-block">${tpl.getHtml()}<div style="font-size: 0.7rem; text-align: right; margin-top: 16px; color: #cfb49c;">—— ${tpl.name} ——</div></div>`;
         });
         container.innerHTML = html;
-        
-        // 添加打印时的纸张尺寸控制
         updatePrintPaperSize(paperSize);
     }
     
-    // 动态注入打印样式（设置@page大小）
     function updatePrintPaperSize(paper) {
         let sizeCSS = '';
         switch(paper) {
@@ -615,26 +496,19 @@
         styleTag.textContent = `@media print { @page { size: ${sizeCSS}; margin: 1.5cm; } body { margin: 0; } }`;
     }
     
-    // 打印功能
     function handlePrint() {
-        // 确保打印前生成最新内容
         generatePages();
         setTimeout(() => {
             window.print();
         }, 100);
     }
     
-    // 初始化界面及事件绑定
     function init() {
         renderTemplateList();
-        // 默认生成一次预览
         generatePages();
         document.getElementById('generateBtn').addEventListener('click', generatePages);
         document.getElementById('printBtn').addEventListener('click', handlePrint);
-        // 纸张切换时重新生成（便于预览调整容器宽度）
-        document.getElementById('paperSizeSelect').addEventListener('change', () => {
-            generatePages();
-        });
+        document.getElementById('paperSizeSelect').addEventListener('change', generatePages);
     }
     
     init();
