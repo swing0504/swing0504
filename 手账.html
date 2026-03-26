@@ -65,9 +65,26 @@
 @media (max-width: 550px) {
     .select-row {
         flex-direction: column;
-        align-items: stretch;  /* 让子元素宽度占满 */
+        align-items: stretch;  /* 子元素宽度占满 */
         gap: 16px;
     }
+    
+    .paper-size {
+        justify-content: space-between; /* 让标签和下拉框两端对齐，视觉更均衡 */
+        width: 100%;
+    }
+    
+    .select-row > div:last-child {
+        justify-content: flex-start;  /* 按钮左对齐 */
+        width: 100%;
+    }
+    
+    /* 可选：让两个按钮占满一定宽度但不要撑满整行，保持紧凑左对齐 */
+    .btn-generate, .btn-print {
+        /* 如果希望按钮宽度自动，保留原有padding即可 */
+        flex: 0 0 auto;
+    }
+}
     
     .paper-size {
         justify-content: space-between;
