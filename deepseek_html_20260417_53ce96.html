@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>斯特鲁普挑战 · 睿麟素质教育</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #FFF2E6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(255, 245, 235, 0.9);
+            border-radius: 56px;
+            padding: 24px 20px 32px;
+            box-shadow: 0 20px 35px rgba(160, 100, 60, 0.12), 0 4px 12px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 700px;
+            transition: all 0.2s ease;
+        }
+
+        .brand {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+            background: rgba(255, 249, 242, 0.7);
+            border-radius: 60px;
+            padding: 6px 20px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+        .brand-logo {
+            height: 48px;
+            width: auto;
+            border-radius: 30px;
+            object-fit: contain;
+        }
+        @media (max-width: 550px) {
+            .brand-logo { height: 38px; }
+        }
+
+        .rule-box {
+            background: #FCE9DC;
+            border-radius: 36px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #7B4A2E;
+            line-height: 1.4;
+            box-shadow: inset 0 0 0 1px #FFF9F2, 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .rule-box p {
+            margin: 6px 0;
+        }
+        .rule-highlight {
+            background: #FADB67;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-weight: 700;
+        }
+
+        .stats-panel {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            background: #FFF9F2;
+            padding: 10px 20px;
+            border-radius: 60px;
+        }
+        .stat-card {
+            background: #FCE9DC;
+            border-radius: 40px;
+            padding: 6px 16px;
+            text-align: center;
+            flex: 1;
+            min-width: 90px;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #B97F5C;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #A66B48;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+
+        .start-btn {
+            background: #AAC88A;
+            color: white;
+            border: none;
+            border-radius: 48px;
+            padding: 8px 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+        .start-btn:active {
+            transform: scale(0.96);
+            background: #8FB573;
+        }
+
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            background: #FFF9F2;
+            border-radius: 40px;
+            padding: 8px 20px;
+            margin: 16px 0 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #976B48;
+        }
+
+        .stimulus {
+            background: #FFFFFF;
+            border-radius: 48px;
+            margin: 16px 0;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 8px 0 #EBD5C0;
+        }
+        .stimulus-word {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+            font-family: "KaiTi", "楷体", "PingFang SC", system-ui;
+        }
+        @media (max-width: 550px) {
+            .stimulus-word { font-size: 2.8rem; }
+        }
+
+        .color-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            margin: 20px 0 16px;
+        }
+        .color-swatch {
+            width: 70px;
+            height: 70px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 3px solid #FFF9F2;
+        }
+        .color-swatch:active {
+            transform: scale(0.94);
+            filter: brightness(0.9);
+        }
+        @media (max-width: 550px) {
+            .color-swatch { width: 55px; height: 55px; }
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+        .action-btn {
+            background: #F5E1D0;
+            border: none;
+            border-radius: 48px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #976B48;
+            cursor: pointer;
+            flex: 1;
+            max-width: 150px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.7rem;
+            color: #D8BDA4;
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 0.9rem;
+            min-height: 2rem;
+            color: #B97F5C;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="brand">
+        <img class="brand-logo" src="logo.png" alt="睿麟素质教育">
+    </div>
+
+    <div class="rule-box">
+        <p>🎯 <strong class="rule-highlight">怎么玩？</strong> 看上方词语的<span style="color:#D35400;">字体颜色</span>，<strong>点击下方对应颜色的色块</strong>，而不是读词语的意思！</p>
+        <p>⚡ 每关需连续正确5次 | 难度递增（2→6种颜色） | 挑战你的注意力抑制能力</p>
+    </div>
+
+    <div class="stats-panel">
+        <div class="stat-card">
+            <div class="stat-label">⏱️ 用时</div>
+            <div class="stat-value" id="timerDisplay">0.00</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">🏆 最佳</div>
+            <div class="stat-value" id="bestDisplay">—</div>
+        </div>
+        <div class="stat-card" style="background:#EAD3C0; padding:4px;">
+            <button class="start-btn" id="startGameBtn">🚀 开始游戏</button>
+        </div>
+    </div>
+
+    <div class="level-info">
+        <span>📚 第 <span id="currentLevel">1</span> / 5 关</span>
+        <span>🎯 本关进度: <span id="levelProgress">0</span> / <span id="levelTarget">5</span></span>
+    </div>
+
+    <div class="stimulus">
+        <div class="stimulus-word" id="stimulusWord">红</div>
+    </div>
+
+    <div class="color-buttons" id="colorButtonsContainer"></div>
+
+    <div class="feedback" id="feedbackMsg"></div>
+
+    <div class="action-bar">
+        <button class="action-btn" id="resetLevelBtn">🔄 重置本关</button>
+        <button class="action-btn" id="newGameBtn">✨ 新游戏</button>
+    </div>
+    <footer>按字体颜色点击色块 | 错误无响应需重新尝试</footer>
+</div>
+
+<script>
+    (function(){
+        // ---------- 颜色配置 ----------
+        const COLOR_PALETTE = [
+            { name: "红", display: "红色", colorCode: "#E34234" },
+            { name: "绿", display: "绿色", colorCode: "#5B8C5A" },
+            { name: "蓝", display: "蓝色", colorCode: "#4682B4" },
+            { name: "黄", display: "黄色", colorCode: "#DAA520" },
+            { name: "紫", display: "紫色", colorCode: "#9B59B6" },
+            { name: "橙", display: "橙色", colorCode: "#E67E22" }
+        ];
+
+        const LEVEL_COLORS_COUNT = [2, 3, 4, 5, 6];
+        const TARGET_PER_LEVEL = 5;
+
+        // 游戏状态
+        let currentLevel = 1;
+        let currentLevelCorrect = 0;
+        let gameActive = false;
+        let gameStarted = false;
+        let timerInterval = null;
+        let startTime = 0;
+        let currentElapsed = 0;
+        let bestTime = null;
+
+        let currentAvailableColors = [];
+        let currentStimulus = { word: "红", colorName: "红", colorCode: "#E34234" };
+        
+        // 防连续相同颜色：记录上一次的字体颜色
+        let lastColorName = null;
+
+        // DOM 元素
+        const stimulusWordEl = document.getElementById('stimulusWord');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const bestDisplay = document.getElementById('bestDisplay');
+        const currentLevelSpan = document.getElementById('currentLevel');
+        const levelProgressSpan = document.getElementById('levelProgress');
+        const levelTargetSpan = document.getElementById('levelTarget');
+        const colorButtonsContainer = document.getElementById('colorButtonsContainer');
+        const feedbackMsg = document.getElementById('feedbackMsg');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const resetLevelBtn = document.getElementById('resetLevelBtn');
+        const newGameBtn = document.getElementById('newGameBtn');
+
+        // ---------- Web Audio ----------
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            return audioCtx;
+        }
+        async function playBeep(frequency = 880, duration = 0.12, volume = 0.2) {
+            try {
+                const ctx = getAudioContext();
+                if (ctx.state === 'suspended') await ctx.resume();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = frequency;
+                gain.gain.value = volume;
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(now + duration);
+            } catch(e) { console.warn(e); }
+        }
+        async function playCorrect() { await playBeep(880, 0.12, 0.25); }
+        async function playError() { await playBeep(520, 0.2, 0.2); }
+        async function playComplete() {
+            const ctx = getAudioContext();
+            if (ctx.state === 'suspended') await ctx.resume();
+            const notes = [523.25, 659.25, 783.99, 1046.5];
+            for (let i = 0; i < notes.length; i++) {
+                await playBeep(notes[i], 0.2, 0.2);
+                await new Promise(r => setTimeout(r, 80));
+            }
+        }
+
+        // ---------- 辅助函数 ----------
+        function updateTimerDisplay() { timerDisplay.textContent = currentElapsed.toFixed(2); }
+        function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+        function startTimer() {
+            if (timerInterval) stopTimer();
+            startTime = performance.now() - currentElapsed * 1000;
+            timerInterval = setInterval(() => {
+                if (!gameStarted || !gameActive) return;
+                const now = performance.now();
+                currentElapsed = (now - startTime) / 1000;
+                updateTimerDisplay();
+            }, 30);
+        }
+
+        function updateBestDisplay() {
+            const stored = localStorage.getItem('stroop_best_time');
+            if (stored !== null && !isNaN(parseFloat(stored))) {
+                bestTime = parseFloat(stored);
+                bestDisplay.textContent = bestTime.toFixed(2) + 's';
+            } else {
+                bestTime = null;
+                bestDisplay.textContent = '——';
+            }
+        }
+        function saveBestTime(seconds) {
+            if (bestTime === null || seconds < bestTime) {
+                bestTime = seconds;
+                localStorage.setItem('stroop_best_time', bestTime.toFixed(3));
+                updateBestDisplay();
+            }
+        }
+
+        function updateUI() {
+            currentLevelSpan.textContent = currentLevel;
+            levelProgressSpan.textContent = currentLevelCorrect;
+            levelTargetSpan.textContent = TARGET_PER_LEVEL;
+        }
+
+        function updateAvailableColors() {
+            const count = LEVEL_COLORS_COUNT[currentLevel - 1];
+            currentAvailableColors = COLOR_PALETTE.slice(0, count);
+        }
+
+        // 防连续相同颜色的随机刺激生成
+        function generateRandomStimulus() {
+            if (!currentAvailableColors.length) return currentStimulus;
+            
+            // 最多尝试10次，避免死循环
+            for (let attempt = 0; attempt < 10; attempt++) {
+                const colorObj = currentAvailableColors[Math.floor(Math.random() * currentAvailableColors.length)];
+                const wordObj = currentAvailableColors[Math.floor(Math.random() * currentAvailableColors.length)];
+                const newColor = colorObj.name;
+                
+                // 如果上一次颜色不为空，且新颜色与上一次相同，则重新生成（尝试）
+                if (lastColorName !== null && newColor === lastColorName) {
+                    continue;
+                }
+                // 接受这个刺激
+                lastColorName = newColor;
+                return {
+                    word: wordObj.name,
+                    colorName: newColor,
+                    colorCode: colorObj.colorCode
+                };
+            }
+            // 如果10次都失败（极端情况，比如只有1种颜色可选时），则使用最后一次随机结果
+            const fallbackColor = currentAvailableColors[Math.floor(Math.random() * currentAvailableColors.length)];
+            const fallbackWord = currentAvailableColors[Math.floor(Math.random() * currentAvailableColors.length)];
+            lastColorName = fallbackColor.name;
+            return {
+                word: fallbackWord.name,
+                colorName: fallbackColor.name,
+                colorCode: fallbackColor.colorCode
+            };
+        }
+
+        function applyStimulus(stimulus) {
+            stimulusWordEl.textContent = stimulus.word;
+            stimulusWordEl.style.color = stimulus.colorCode;
+        }
+
+        function refreshStimulus() {
+            currentStimulus = generateRandomStimulus();
+            applyStimulus(currentStimulus);
+        }
+
+        function renderColorButtons() {
+            colorButtonsContainer.innerHTML = '';
+            currentAvailableColors.forEach(color => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = color.colorCode;
+                swatch.setAttribute('data-color', color.name);
+                swatch.setAttribute('aria-label', `颜色 ${color.display}`);
+                swatch.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!gameStarted || !gameActive) {
+                        feedbackMsg.textContent = '请先点击“开始游戏”或“新游戏”开始挑战！';
+                        setTimeout(() => { if(feedbackMsg) feedbackMsg.textContent = ''; }, 1500);
+                        return;
+                    }
+                    const clickedColor = color.name;
+                    if (clickedColor === currentStimulus.colorName) {
+                        handleCorrect();
+                    } else {
+                        handleError();
+                    }
+                });
+                colorButtonsContainer.appendChild(swatch);
+            });
+        }
+
+        function handleCorrect() {
+            if (!gameStarted || !gameActive) return;
+            playCorrect();
+            currentLevelCorrect++;
+            updateUI();
+
+            if (currentLevelCorrect >= TARGET_PER_LEVEL) {
+                if (currentLevel === 5) {
+                    gameActive = false;
+                    gameStarted = false;
+                    stopTimer();
+                    const finalTime = currentElapsed;
+                    saveBestTime(finalTime);
+                    playComplete();
+                    alert(`🎉 恭喜完成全部5关！\n⏱️ 总用时：${finalTime.toFixed(2)} 秒\n🏅 优秀！`);
+                    feedbackMsg.textContent = '🎉 游戏通关！点击“新游戏”继续挑战。';
+                } else {
+                    currentLevel++;
+                    currentLevelCorrect = 0;
+                    updateAvailableColors();
+                    renderColorButtons();
+                    // 重置防连续历史（新关卡重新开始记录）
+                    lastColorName = null;
+                    refreshStimulus();
+                    updateUI();
+                    feedbackMsg.textContent = `🎉 进入第 ${currentLevel} 关！颜色增加，难度提升！`;
+                    setTimeout(() => { if(feedbackMsg) feedbackMsg.textContent = ''; }, 1800);
+                }
+            } else {
+                refreshStimulus();
+                feedbackMsg.textContent = '✓ 正确！';
+                setTimeout(() => { if(feedbackMsg && feedbackMsg.textContent === '✓ 正确！') feedbackMsg.textContent = ''; }, 300);
+            }
+        }
+
+        function handleError() {
+            if (!gameStarted || !gameActive) return;
+            playError();
+            feedbackMsg.textContent = '❌ 错误！请重新点击当前词语的正确颜色';
+            setTimeout(() => { if(feedbackMsg && feedbackMsg.textContent === '❌ 错误！请重新点击当前词语的正确颜色') feedbackMsg.textContent = ''; }, 1000);
+        }
+
+        function resetCurrentLevel() {
+            if (!gameStarted || !gameActive) {
+                feedbackMsg.textContent = '游戏未开始，请先点击“开始游戏”';
+                return;
+            }
+            currentLevelCorrect = 0;
+            updateUI();
+            refreshStimulus();
+            feedbackMsg.textContent = '本关进度已重置，继续挑战！';
+            setTimeout(() => { if(feedbackMsg) feedbackMsg.textContent = ''; }, 1200);
+        }
+
+        function startNewGame() {
+            stopTimer();
+            currentLevel = 1;
+            currentLevelCorrect = 0;
+            currentElapsed = 0;
+            updateTimerDisplay();
+            gameActive = true;
+            gameStarted = true;
+            lastColorName = null;   // 重置防连续历史
+            updateAvailableColors();
+            renderColorButtons();
+            currentStimulus = generateRandomStimulus();
+            applyStimulus(currentStimulus);
+            updateUI();
+            feedbackMsg.textContent = '游戏开始！按字体颜色点击色块！';
+            setTimeout(() => { if(feedbackMsg) feedbackMsg.textContent = ''; }, 2000);
+            startTimer();
+        }
+
+        function resetLevel() {
+            if (!gameStarted) {
+                feedbackMsg.textContent = '请先点击“开始游戏”或“新游戏”';
+                return;
+            }
+            if (!gameActive) {
+                feedbackMsg.textContent = '游戏已完成，请点击“新游戏”重新挑战';
+                return;
+            }
+            resetCurrentLevel();
+        }
+
+        function newGame() {
+            stopTimer();
+            startNewGame();
+        }
+
+        function startGame() {
+            if (gameStarted && gameActive) {
+                if (confirm('游戏进行中，开始新游戏将重置当前进度，确定吗？')) {
+                    startNewGame();
+                }
+            } else {
+                startNewGame();
+            }
+        }
+
+        function init() {
+            updateBestDisplay();
+            currentLevel = 1;
+            currentLevelCorrect = 0;
+            gameActive = false;
+            gameStarted = false;
+            currentElapsed = 0;
+            updateTimerDisplay();
+            updateAvailableColors();
+            renderColorButtons();
+            currentStimulus = { word: "红", colorName: "红", colorCode: "#E34234" };
+            applyStimulus(currentStimulus);
+            updateUI();
+            feedbackMsg.textContent = '点击“开始游戏”按钮，挑战5关！';
+            startGameBtn.addEventListener('click', startGame);
+            resetLevelBtn.addEventListener('click', resetLevel);
+            newGameBtn.addEventListener('click', newGame);
+            
+            const unlockAudio = async () => {
+                const ctx = getAudioContext();
+                if (ctx.state === 'suspended') await ctx.resume();
+                document.body.removeEventListener('touchstart', unlockAudio);
+                document.body.removeEventListener('mousedown', unlockAudio);
+            };
+            document.body.addEventListener('touchstart', unlockAudio, { once: true });
+            document.body.addEventListener('mousedown', unlockAudio, { once: true });
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>
